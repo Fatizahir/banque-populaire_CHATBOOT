@@ -48,8 +48,8 @@ if user_query := st.chat_input("Posez votre question..."):
     with st.chat_message("assistant"):
         with st.spinner("Votre conseiller répond..."):
             try:
-                # REQUÊTE PERFECT: Utilisation du modèle gratuit flash sur l'API stable v1
-                url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
+                # CORRECTION FINALE : gemini-1.5-flash-latest sur l'API v1
+                url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
                 payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
                 headers = {"Content-Type": "application/json"}
                 
@@ -59,7 +59,7 @@ if user_query := st.chat_input("Posez votre question..."):
                 if 'candidates' in response_data and len(response_data['candidates']) > 0:
                     answer = response_data['candidates'][0]['content']['parts'][0]['text']
                 else:
-                    error_msg = response_data.get('error', {}).get('message', 'Erreur de réponse')
+                    error_msg = response_data.get('error', {}).get('message', "Erreur d'envoi")
                     answer = f"Désolé, impossible de répondre (Détail : {error_msg})"
                 
                 st.write(answer)
