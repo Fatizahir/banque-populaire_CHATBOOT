@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # 1. Configuration visuelle Banque Populaire
-st.set_config = st.set_page_config(page_title="BP Assistant - Banque Populaire", page_icon="🏦", layout="wide")
+st.set_page_config(page_title="BP Assistant - Banque Populaire", page_icon="🏦", layout="wide")
 
 st.markdown("""
     <style>
@@ -14,12 +14,8 @@ st.markdown("""
 st.title("🏦 Assistant Virtuel — Banque Populaire")
 st.caption("Votre conseiller IA pour vos simulations de crédit et l'analyse de vos justificatifs.")
 
-# 2. Récupération de la clé API depuis les Secrets
-api_key = st.secrets.get("GEMINI_API_KEY", "")
-
-if not api_key:
-    st.info("Veuillez configurer votre clé API Gemini dans les Secrets de Streamlit.", icon="🔑")
-    st.stop()
+# 2. Clé API configurée directement en dur pour éviter les erreurs de Secrets
+api_key = "AIzaSyAQ-Ab8RN6IwQhw2Ew5quwCRPECDwcHm1qjnDcXL8U-vmltGfLV-lw"
 
 # 3. Initialisation de l'historique
 if "messages" not in st.session_state:
@@ -27,7 +23,7 @@ if "messages" not in st.session_state:
         {"role": "assistant", "content": "Bonjour ! Je suis votre conseiller virtuel Banque Populaire. Comment puis-je vous accompagner aujourd'hui ?"}
     ]
 
-# 4. Gestion simplifiée des documents dans la barre latérale
+# 4. Gestion des documents dans la barre latérale
 st.sidebar.header("📁 Espace Documents")
 uploaded_file = st.sidebar.file_uploader("Déposez un justificatif (PDF, Image)", type=["pdf", "png", "jpg", "jpeg"])
 
@@ -54,7 +50,7 @@ if user_query := st.chat_input("Posez votre question..."):
     with st.chat_message("assistant"):
         with st.spinner("Votre conseiller répond..."):
             try:
-                # Appel direct HTTP à l'API Google
+                # API Call
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
                 payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
                 headers = {"Content-Type": "application/json"}
@@ -62,13 +58,10 @@ if user_query := st.chat_input("Posez votre question..."):
                 response = requests.post(url, json=payload, headers=headers)
                 response_data = response.json()
                 
-                # Extraction sécurisée du texte
-                if 'candidates' in response_data:
-                    answer = response_data['candidates'][0]['content']['parts'][0]['text']
-                else:
-                    answer = f"Erreur de l'API Google : {response_data.get('error', {}).get('message', 'Clé invalide')}"
+                # Extraction du texte
+                answer = response_data['candidates'][0]['content']['parts'][0]['text']
                 
                 st.write(answer)
                 st.session_state.messages.append({"role": "assistant", "content": answer})
             except Exception as e:
-                st.error(f"Erreur technique : {e}")
+                st.error("Une erreur s'est produite lors de la connexion avec l'IA.")
