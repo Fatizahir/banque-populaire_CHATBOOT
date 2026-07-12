@@ -48,8 +48,8 @@ if user_query := st.chat_input("Posez votre question..."):
     with st.chat_message("assistant"):
         with st.spinner("Votre conseiller répond..."):
             try:
-                # VERSION MISE À JOUR : Utilisation de gemini-2.5-flash sur l'API v1beta
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+                # VERSION CORRIGÉE : Utilisation de gemini-1.5-flash sur v1beta
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
                 payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
                 headers = {"Content-Type": "application/json"}
                 
