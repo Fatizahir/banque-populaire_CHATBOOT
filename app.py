@@ -14,8 +14,8 @@ st.markdown("""
 st.title("🏦 Assistant Virtuel — Banque Populaire")
 st.caption("Votre conseiller IA pour vos simulations de crédit et l'analyse de vos justificatifs.")
 
-# 2. Clé API configurée directement en dur pour éviter les erreurs de Secrets
-api_key = "AIzaSyAQ-Ab8RN6IwQhw2Ew5quwCRPECDwcHm1qjnDcXL8U-vmltGfLV-lw"
+# 2. Clé API exacte et complète (Clé 2 du Google AI Studio de Fati)
+api_key = "AIzaSyAQ_Ab8RN6IS9WItvF8cBXTbZDtAmVl0DTjdMU7cZF7r6wyki-QTtA"
 
 # 3. Initialisation de l'historique
 if "messages" not in st.session_state:
@@ -50,7 +50,7 @@ if user_query := st.chat_input("Posez votre question..."):
     with st.chat_message("assistant"):
         with st.spinner("Votre conseiller répond..."):
             try:
-                # API Call
+                # Appel direct à l'API Gemini 1.5 Flash
                 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
                 payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
                 headers = {"Content-Type": "application/json"}
@@ -58,10 +58,14 @@ if user_query := st.chat_input("Posez votre question..."):
                 response = requests.post(url, json=payload, headers=headers)
                 response_data = response.json()
                 
-                # Extraction du texte
-                answer = response_data['candidates'][0]['content']['parts'][0]['text']
+                # Extraction du texte de la réponse
+                if 'candidates' in response_data and len(response_data['candidates']) > 0:
+                    answer = response_data['candidates'][0]['content']['parts'][0]['text']
+                else:
+                    error_msg = response_data.get('error', {}).get('message', 'Erreur inconnue')
+                    answer = f"Désolé, impossible de répondre (Détail : {error_msg})"
                 
                 st.write(answer)
                 st.session_state.messages.append({"role": "assistant", "content": answer})
             except Exception as e:
-                st.error("Une erreur s'est produite lors de la connexion avec l'IA.")
+                st.error("Une erreur technique est survenue lors de la communication.")
